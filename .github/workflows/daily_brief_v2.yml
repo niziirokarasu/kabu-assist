@@ -1,0 +1,28 @@
+name: デイリーブリーフィング
+
+on:
+  schedule:
+    # UTC 22:45 = 日本時間 朝7:45 (米国市場クローズ後・東京市場オープン前)
+    # 平日のみ (日本の月-金 = UTC の日-木の夜)
+    - cron: "45 22 * * 0-4"
+  workflow_dispatch: {}  # 手動実行も可能
+
+jobs:
+  brief:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: 依存関係インストール
+        run: pip install -r requirements.txt
+
+      - name: ブリーフィング生成・投稿
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: python src/daily_brief.py
