@@ -1,0 +1,48 @@
+name: 急変動監視
+
+on:
+  schedule:
+    # 東京市場時間 (日本 9:00-15:30 = UTC 0:00-6:30) を2時間おき
+    - cron: "15 0,2,4,6 * * 1-5"
+    # 米国市場時間 (NY 9:30-16:00 = UTC 14:30-21:00 夏時間) を2時間おき
+    - cron: "45 14,16,18,20 * * 1-5"
+  workflow_dispatch: {}
+
+concurrency:
+  group: event-watch
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: 依存関係インストール
+        run: pip install -r requirements.txt
+
+      # 当日の通知済みアラートを復元 (同じ通知の繰り返しを防止)
+      - name: アラート状態を復元
+        uses: actions/cache/restore@v4
+        with:
+          path: .alert_state.json
+          key: alert-state-${{ github.run_id }}
+          restore-keys: alert-state-
+
+      - name: 急変動チェック
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: python src/event_watch.py
+
+      - name: アラート状態を保存
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: .alert_state.json
+          key: alert-state-${{ github.run_id }}

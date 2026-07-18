@@ -1,0 +1,27 @@
+{
+  "_comment": "自分の監視銘柄・設定をここで編集する。日本株は「コード.T」形式",
+  "watchlist": {
+    "日本株": ["7203.T", "8035.T", "8306.T", "7011.T", "9432.T"],
+    "米国株": ["NVDA", "MU", "AAPL", "MSFT"]
+  },
+  "indices": {
+    "^N225": "日経平均",
+    "^SPX": "S&P500",
+    "^IXIC": "NASDAQ",
+    "^VIX": "VIX(恐怖指数)",
+    "JPY=X": "ドル円",
+    "CL=F": "WTI原油"
+  },
+  "alert_thresholds": {
+    "_comment2": "随時通知のしきい値。この変動率(%)を超えたらDiscordに緊急通知",
+    "index_move_pct": 2.0,
+    "watchlist_move_pct": 5.0,
+    "vix_level": 25,
+    "usdjpy_move_pct": 1.0
+  },
+  "claude": {
+    "model": "claude-haiku-4-5-20251001",
+    "_model_note": "コスト重視ならhaiku、分析の質重視なら claude-sonnet-4-6 に変更(コストは数倍になる)",
+    "max_tokens": 2500
+  }
+}
