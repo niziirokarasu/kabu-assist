@@ -6,7 +6,7 @@
   },
   "indices": {
     "^N225": "日経平均",
-    "^SPX": "S&P500",
+    "^GSPC": "S&P500",
     "^IXIC": "NASDAQ",
     "^VIX": "VIX(恐怖指数)",
     "JPY=X": "ドル円",
@@ -21,7 +21,7 @@
   },
   "claude": {
     "model": "claude-haiku-4-5-20251001",
-    "_model_note": "コスト重視ならhaiku、分析の質重視なら claude-sonnet-4-6 に変更(コストは数倍になる)",
+    "_model_note": "コスト重視ならhaiku、分析の質重視なら claude-sonnet-5 に変更(コストは数倍になる)",
     "max_tokens": 2500
   }
 }

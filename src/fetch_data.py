@@ -20,6 +20,20 @@ def load_knowledge():
     return sector_map, calendar
 
 
+def _read_fast_info(info, key: str) -> float:
+    """fast_info は yfinance のバージョンによって属性アクセス / 辞書アクセスの
+    どちらでも返りうるため、両方を試してから 0 にフォールバックする"""
+    val = None
+    try:
+        val = info[key]
+    except Exception:
+        val = getattr(info, key, None)
+    try:
+        return round(float(val or 0), 2)
+    except (TypeError, ValueError):
+        return 0.0
+
+
 def fetch_ticker_summary(ticker: str) -> dict | None:
     """1銘柄の直近データを取得。直近5営業日の終値から変動率も計算"""
     try:
@@ -43,8 +57,8 @@ def fetch_ticker_summary(ticker: str) -> dict | None:
             "price": round(last, 2),
             "day_change_pct": round(day_chg, 2),
             "week_change_pct": round(week_chg, 2),
-            "year_high": round(float(getattr(info, "year_high", 0) or 0), 2),
-            "year_low": round(float(getattr(info, "year_low", 0) or 0), 2),
+            "year_high": _read_fast_info(info, "year_high"),
+            "year_low": _read_fast_info(info, "year_low"),
         }
     except Exception as e:
         print(f"[warn] {ticker} の取得失敗: {e}")
@@ -54,12 +68,15 @@ def fetch_ticker_summary(ticker: str) -> dict | None:
 def fetch_market_snapshot(config: dict) -> dict:
     """指数+ウォッチリスト全体のスナップショットを取得"""
     snapshot = {"indices": [], "watchlist": []}
+    missing = []
 
     for ticker, name in config["indices"].items():
         d = fetch_ticker_summary(ticker)
         if d:
             d["name"] = name
             snapshot["indices"].append(d)
+        else:
+            missing.append(f"{name}({ticker})")
 
     for market, tickers in config["watchlist"].items():
         for ticker in tickers:
@@ -67,6 +84,12 @@ def fetch_market_snapshot(config: dict) -> dict:
             if d:
                 d["market"] = market
                 snapshot["watchlist"].append(d)
+            else:
+                missing.append(ticker)
+
+    if missing:
+        # 銘柄コードの誤りに気づけるよう、取得できなかった分をまとめて表示する
+        print(f"[warn] データ取得できず除外: {', '.join(missing)}")
 
     return snapshot
 

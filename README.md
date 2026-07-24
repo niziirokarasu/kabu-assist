@@ -50,7 +50,7 @@ git push -u origin main
 - **アラート感度**: `config.json` の `alert_thresholds` を編集
 - **業界知識の追加**: `knowledge/sector_map.json` に新しいテーマ・銘柄・連動ロジックを自由に追記。**ここを育てるほどツールが賢くなります**
 - **イベントの追加**: `knowledge/event_calendar.json` に決算日・選挙・金融政策会合などを追記
-- **分析の質を上げる**: `config.json` の `claude.model` を `claude-sonnet-4-6` に変更(コストは数倍)
+- **分析の質を上げる**: `config.json` の `claude.model` を `claude-sonnet-5` に変更(コストは数倍)
 
 ## 通知スケジュール(日本時間)
 
